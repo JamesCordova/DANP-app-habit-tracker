@@ -27,6 +27,7 @@ fun ProgressBarHabits(
                 modifier = Modifier
                     .fillMaxWidth(progress)
                     .height(4.dp)
+                    .clip(RoundedCornerShape(2.dp))
                     .background(ProgressIndicatorDefaults.linearColor)
             )
         }
