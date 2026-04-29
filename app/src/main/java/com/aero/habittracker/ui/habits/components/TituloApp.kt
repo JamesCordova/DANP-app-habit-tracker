@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 @Composable
 fun TituloApp() {
     Text(
-        text = "Gestor de Tareas",
+        text = "Habit Tracker",
         style = MaterialTheme.typography.headlineMedium,
         color = MaterialTheme.colorScheme.primary
     )
