@@ -35,12 +35,11 @@ fun HabitItem(
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = habit.title,
-                style = if (habit.isCompletedToday)
-                    MaterialTheme.typography.bodyLarge.copy(
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                else
-                    MaterialTheme.typography.bodyLarge
+                color = if (habit.isCompletedToday)
+                            MaterialTheme.colorScheme.primary
+                        else
+                            MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.bodyLarge
             )
         }
         Button(onClick = onDelete) {
