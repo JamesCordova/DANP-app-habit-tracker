@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.aero.habittracker.HabitTrackerApplication
+import com.aero.habittracker.ui.habits.components.HabitFilterButtons
 import com.aero.habittracker.ui.habits.components.InputNewHabit
 import com.aero.habittracker.ui.habits.components.ListHabits
 import com.aero.habittracker.ui.habits.components.ProgressBarHabits
@@ -32,8 +33,9 @@ fun HabitTrackerScreen(
     viewModel: HabitTrackerViewModel = viewModel(factory = habitTrackerViewModelFactory(application))
 ) {
     val input = viewModel.input
-    val habits by viewModel.habits.collectAsState()
     val progress = viewModel.progress
+    val currentFilter by viewModel.currentFilterFlow.collectAsState()
+    val filteredHabits by viewModel.filteredHabits.collectAsState()
 
     Column(
         modifier = modifier
@@ -65,8 +67,15 @@ fun HabitTrackerScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        HabitFilterButtons(
+            currentFilter = currentFilter,
+            onFilterChange = { filter -> viewModel.setFilter(filter) }
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         ListHabits(
-            habits = habits,
+            habits = filteredHabits,
             onToggleHabit = { habit, checked ->
                 viewModel.toggleHabit(habit, checked)
             },
