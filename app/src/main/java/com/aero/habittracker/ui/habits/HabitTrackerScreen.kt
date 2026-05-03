@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,8 +26,9 @@ import com.aero.habittracker.ui.habits.components.TituloApp
 @Composable
 fun HabitTrackerScreen(
     application: HabitTrackerApplication,
-    modifier: Modifier = Modifier,
     onNavigateBack: () -> Unit = {},
+    onNavigateToDetail: (Int) -> Unit = {},
+    modifier: Modifier = Modifier,
     viewModel: HabitTrackerViewModel = viewModel(factory = habitTrackerViewModelFactory(application))
 ) {
     val input = viewModel.input
@@ -37,6 +39,7 @@ fun HabitTrackerScreen(
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
+            .safeDrawingPadding()
             .padding(16.dp)
     ) {
         TituloApp()
@@ -69,6 +72,9 @@ fun HabitTrackerScreen(
             },
             onDeleteHabit = { habit ->
                 viewModel.deleteHabit(habit)
+            },
+            onSelectHabit = { habit ->
+                onNavigateToDetail(habit.id)
             }
         )
     }
