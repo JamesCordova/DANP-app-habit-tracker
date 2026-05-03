@@ -26,6 +26,7 @@ import com.aero.habittracker.ui.habits.components.TituloApp
 fun HabitTrackerScreen(
     application: HabitTrackerApplication,
     modifier: Modifier = Modifier,
+    onNavigateBack: () -> Unit = {},
     viewModel: HabitTrackerViewModel = viewModel(factory = habitTrackerViewModelFactory(application))
 ) {
     val input = viewModel.input
@@ -73,10 +74,3 @@ fun HabitTrackerScreen(
     }
 }
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun HabitTrackerScreenPreview() {
-    // Para preview, creamos una aplicación mock
-    val mockApp = HabitTrackerApplication()
-    HabitTrackerScreen(application = mockApp)
-}
