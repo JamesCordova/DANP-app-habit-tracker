@@ -7,21 +7,43 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aero.habittracker.data.repository.HabitRepository
 import com.aero.habittracker.domain.Habit
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+enum class HabitFilter {
+    ALL, COMPLETED, PENDING
+}
 
 class HabitTrackerViewModel(private val repository: HabitRepository) : ViewModel() {
     var input by mutableStateOf("")
         private set
 
-    var habits = repository.getAllHabits()
+    private val filterStateFlow = MutableStateFlow(HabitFilter.ALL)
+
+    val currentFilterFlow: StateFlow<HabitFilter> = filterStateFlow
+
+    val habits: StateFlow<List<Habit>> = repository.getAllHabits()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
+
+    val filteredHabits: StateFlow<List<Habit>> = filterStateFlow.flatMapLatest { filter ->
+        when (filter) {
+            HabitFilter.ALL -> repository.getAllHabits()
+            HabitFilter.COMPLETED -> repository.getCompletedHabits()
+            HabitFilter.PENDING -> repository.getPendingHabits()
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
 
     val completedCount: Int
         get() = habits.value.count { it.isCompletedToday }
@@ -33,6 +55,10 @@ class HabitTrackerViewModel(private val repository: HabitRepository) : ViewModel
 
     fun onInputChange(newInput: String) {
         input = newInput
+    }
+
+    fun setFilter(filter: HabitFilter) {
+        filterStateFlow.value = filter
     }
 
     fun addHabit() {
