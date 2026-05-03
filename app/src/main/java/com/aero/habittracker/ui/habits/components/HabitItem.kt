@@ -1,5 +1,7 @@
 package com.aero.habittracker.ui.habits.components
 
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,15 +21,21 @@ import com.aero.habittracker.domain.Habit
 fun HabitItem(
     habit: Habit,
     onToggle: (Boolean) -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onClick: () -> Unit = {}
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = 8.dp)
+            .clickable { onClick() },
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Row(modifier = Modifier.weight(1f)) {
+        Row(
+            modifier = Modifier
+                .weight(1f),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Checkbox(
                 checked = habit.isCompletedToday,
                 onCheckedChange = onToggle
