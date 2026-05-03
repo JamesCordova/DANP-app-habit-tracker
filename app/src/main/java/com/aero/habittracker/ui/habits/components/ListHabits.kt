@@ -9,7 +9,8 @@ import com.aero.habittracker.domain.Habit
 fun ListHabits(
     habits: List<Habit>,
     onToggleHabit: (Habit, Boolean) -> Unit,
-    onDeleteHabit: (Habit) -> Unit
+    onDeleteHabit: (Habit) -> Unit,
+    onSelectHabit: (Habit) -> Unit = {}
 ) {
     LazyColumn {
         items(habits, key = { it.id }) { habit ->
@@ -20,6 +21,9 @@ fun ListHabits(
                 },
                 onDelete = {
                     onDeleteHabit(habit)
+                },
+                onClick = {
+                    onSelectHabit(habit)
                 }
             )
         }
