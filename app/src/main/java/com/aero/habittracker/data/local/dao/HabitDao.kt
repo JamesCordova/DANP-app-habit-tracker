@@ -10,17 +10,55 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface HabitDao {
-    @Query("SELECT * FROM habits ORDER BY id DESC")
-    fun getAllHabits(): Flow<List<HabitEntity>>
+    @Query("""
+        SELECT h.id, h.title, CASE 
+            WHEN hl.id IS NOT NULL THEN 1 
+            ELSE 0 
+        END as isCompletedToday
+        FROM habits h
+        LEFT JOIN habit_logs hl ON h.id = hl.habitId 
+            AND DATE(hl.date) = DATE('now')
+        ORDER BY h.id DESC
+    """)
+    fun getAllHabits(): Flow<List<HabitWithCompletion>>
 
-    @Query("SELECT * FROM habits WHERE isCompletedToday = 1 ORDER BY id DESC")
-    fun getCompletedHabits(): Flow<List<HabitEntity>>
+    @Query("""
+        SELECT h.id, h.title, CASE 
+            WHEN hl.id IS NOT NULL THEN 1 
+            ELSE 0 
+        END as isCompletedToday
+        FROM habits h
+        LEFT JOIN habit_logs hl ON h.id = hl.habitId 
+            AND DATE(hl.date) = DATE('now')
+        WHERE hl.id IS NOT NULL
+        ORDER BY h.id DESC
+    """)
+    fun getCompletedHabits(): Flow<List<HabitWithCompletion>>
 
-    @Query("SELECT * FROM habits WHERE isCompletedToday = 0 ORDER BY id DESC")
-    fun getPendingHabits(): Flow<List<HabitEntity>>
+    @Query("""
+        SELECT h.id, h.title, CASE 
+            WHEN hl.id IS NOT NULL THEN 1 
+            ELSE 0 
+        END as isCompletedToday
+        FROM habits h
+        LEFT JOIN habit_logs hl ON h.id = hl.habitId 
+            AND DATE(hl.date) = DATE('now')
+        WHERE hl.id IS NULL
+        ORDER BY h.id DESC
+    """)
+    fun getPendingHabits(): Flow<List<HabitWithCompletion>>
 
-    @Query("SELECT * FROM habits WHERE id = :id")
-    suspend fun getHabitById(id: Int): HabitEntity?
+    @Query("""
+        SELECT h.id, h.title, CASE 
+            WHEN hl.id IS NOT NULL THEN 1 
+            ELSE 0 
+        END as isCompletedToday
+        FROM habits h
+        LEFT JOIN habit_logs hl ON h.id = hl.habitId 
+            AND DATE(hl.date) = DATE('now')
+        WHERE h.id = :id
+    """)
+    suspend fun getHabitById(id: Int): HabitWithCompletion?
 
     @Insert
     suspend fun insertHabit(habit: HabitEntity): Long
@@ -34,3 +72,11 @@ interface HabitDao {
     @Query("DELETE FROM habits")
     suspend fun deleteAllHabits()
 }
+
+// DTO para retornar Habit con isCompletedToday calculado
+data class HabitWithCompletion(
+    val id: Int,
+    val title: String,
+    val isCompletedToday: Boolean
+)
+

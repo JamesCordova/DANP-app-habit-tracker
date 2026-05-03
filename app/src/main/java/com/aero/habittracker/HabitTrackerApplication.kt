@@ -6,6 +6,6 @@ import com.aero.habittracker.data.repository.HabitRepository
 
 class HabitTrackerApplication : Application() {
     private val database by lazy { AppDatabase.getInstance(this) }
-    val repository by lazy { HabitRepository(database.habitDao()) }
+    val repository by lazy { HabitRepository(database.habitDao(), database.habitLogDao()) }
 }
 

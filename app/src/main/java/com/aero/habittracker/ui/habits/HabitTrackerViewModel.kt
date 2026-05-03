@@ -77,7 +77,7 @@ class HabitTrackerViewModel(private val repository: HabitRepository) : ViewModel
 
     fun toggleHabit(habit: Habit, isChecked: Boolean) {
         viewModelScope.launch {
-            repository.updateHabit(habit.copy(isCompletedToday = isChecked))
+            repository.toggleHabitCompletion(habit.id)
         }
     }
 

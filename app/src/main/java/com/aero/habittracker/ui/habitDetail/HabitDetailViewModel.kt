@@ -2,11 +2,14 @@ package com.aero.habittracker.ui.habitDetail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aero.habittracker.data.local.entity.HabitLogEntity
 import com.aero.habittracker.data.repository.HabitRepository
 import com.aero.habittracker.domain.Habit
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class HabitDetailViewModel(
@@ -22,6 +25,13 @@ class HabitDetailViewModel(
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
+
+    val habitLogs: StateFlow<List<HabitLogEntity>> = repository.getHabitLogs(habitId)
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
     init {
         loadHabit()
@@ -57,9 +67,15 @@ class HabitDetailViewModel(
     }
 
     fun toggleCompletionStatus() {
-        _habit.value?.let { currentHabit ->
-            val updatedHabit = currentHabit.copy(isCompletedToday = !currentHabit.isCompletedToday)
-            updateHabit(updatedHabit)
+        viewModelScope.launch {
+            try {
+                repository.toggleHabitCompletion(habitId)
+                // Recargar el hábito para obtener el estado actualizado
+                val updatedHabit = repository.getHabitById(habitId)
+                _habit.value = updatedHabit
+            } catch (e: Exception) {
+                _error.value = "Error al cambiar el estado: ${e.message}"
+            }
         }
     }
 
@@ -75,3 +91,4 @@ class HabitDetailViewModel(
         }
     }
 }
+
