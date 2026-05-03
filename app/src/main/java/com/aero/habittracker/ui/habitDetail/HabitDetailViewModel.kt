@@ -90,5 +90,25 @@ class HabitDetailViewModel(
             }
         }
     }
+
+    fun addLogForDate(date: java.time.LocalDate) {
+        viewModelScope.launch {
+            try {
+                repository.addHabitLogForDate(habitId, date)
+            } catch (e: Exception) {
+                _error.value = "Error al agregar registro: ${e.message}"
+            }
+        }
+    }
+
+    fun removeLogForDate(date: java.time.LocalDate) {
+        viewModelScope.launch {
+            try {
+                repository.removeHabitLogForDate(habitId, date)
+            } catch (e: Exception) {
+                _error.value = "Error al eliminar registro: ${e.message}"
+            }
+        }
+    }
 }
 

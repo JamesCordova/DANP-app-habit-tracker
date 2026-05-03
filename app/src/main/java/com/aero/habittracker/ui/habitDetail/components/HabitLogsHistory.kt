@@ -53,7 +53,7 @@ private fun HabitLogItem(log: HabitLogEntity) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(12.dp),
+            .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -101,10 +101,11 @@ private fun formatDate(date: LocalDate): String {
 
 private fun getDayOfWeek(date: LocalDate): String {
     val dayNames = arrayOf(
-        "Lunes", "Martes", "Miércoles", "Jueves",
-        "Viernes", "Sábado", "Domingo"
+        "Domingo", "Lunes", "Martes", "Miércoles", "Jueves",
+        "Viernes", "Sábado"
     )
     val dayOfWeek = date.dayOfWeek.value % 7
     return dayNames[dayOfWeek]
 }
+
 

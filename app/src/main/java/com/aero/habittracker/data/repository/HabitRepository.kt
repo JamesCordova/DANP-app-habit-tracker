@@ -62,6 +62,17 @@ class HabitRepository(
         }
     }
 
+    suspend fun addHabitLogForDate(habitId: Int, date: LocalDate) {
+        val existingLog = habitLogDao.getLogByHabitAndDate(habitId, date)
+        if (existingLog == null) {
+            habitLogDao.insertLog(HabitLogEntity(habitId = habitId, date = date))
+        }
+    }
+
+    suspend fun removeHabitLogForDate(habitId: Int, date: LocalDate) {
+        habitLogDao.deleteLogByHabitAndDate(habitId, date)
+    }
+
     fun getHabitLogs(habitId: Int): Flow<List<HabitLogEntity>> {
         return habitLogDao.getLogsByHabit(habitId)
     }

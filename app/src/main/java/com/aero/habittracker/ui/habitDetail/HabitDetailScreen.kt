@@ -21,6 +21,7 @@ import com.aero.habittracker.ui.habitDetail.components.HabitDetailError
 import com.aero.habittracker.ui.habitDetail.components.HabitDetailHeader
 import com.aero.habittracker.ui.habitDetail.components.HabitDetailLoading
 import com.aero.habittracker.ui.habitDetail.components.HabitLogsHistory
+import com.aero.habittracker.ui.habitDetail.components.HabitLogForm
 
 @Composable
 fun HabitDetailScreen(
@@ -72,6 +73,21 @@ fun HabitDetailScreen(
                             onDelete = {
                                 viewModel.deleteHabit()
                                 onNavigateBack()
+                            }
+                        )
+                    }
+                }
+
+                item {
+                    Spacer(modifier = Modifier.height(24.dp))
+                }
+
+                item {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        HabitLogForm(
+                            habitId = habit!!.id,
+                            onAddLog = { date ->
+                                viewModel.addLogForDate(date)
                             }
                         )
                     }
