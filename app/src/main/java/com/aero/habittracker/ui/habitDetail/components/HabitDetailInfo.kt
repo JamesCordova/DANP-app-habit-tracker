@@ -13,9 +13,7 @@ import com.aero.habittracker.domain.Habit
 
 @Composable
 fun HabitDetailInfo(habit: Habit) {
-    Column(
-        modifier = Modifier.padding(horizontal = 16.dp)
-    ) {
+    Column {
         Text(
             text = "Nombre del hábito",
             style = MaterialTheme.typography.labelSmall,
