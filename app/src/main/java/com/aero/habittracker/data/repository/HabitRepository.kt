@@ -14,6 +14,18 @@ class HabitRepository(private val habitDao: HabitDao) {
         }
     }
 
+    fun getCompletedHabits(): Flow<List<Habit>> {
+        return habitDao.getCompletedHabits().map { entities ->
+            entities.map { it.toDomain() }
+        }
+    }
+
+    fun getPendingHabits(): Flow<List<Habit>> {
+        return habitDao.getPendingHabits().map { entities ->
+            entities.map { it.toDomain() }
+        }
+    }
+
     suspend fun insertHabit(habit: Habit): Long {
         return habitDao.insertHabit(habit.toEntity())
     }
