@@ -13,6 +13,12 @@ interface HabitDao {
     @Query("SELECT * FROM habits ORDER BY id DESC")
     fun getAllHabits(): Flow<List<HabitEntity>>
 
+    @Query("SELECT * FROM habits WHERE isCompletedToday = 1 ORDER BY id DESC")
+    fun getCompletedHabits(): Flow<List<HabitEntity>>
+
+    @Query("SELECT * FROM habits WHERE isCompletedToday = 0 ORDER BY id DESC")
+    fun getPendingHabits(): Flow<List<HabitEntity>>
+
     @Query("SELECT * FROM habits WHERE id = :id")
     suspend fun getHabitById(id: Int): HabitEntity?
 
