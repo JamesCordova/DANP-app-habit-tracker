@@ -19,7 +19,7 @@ fun ProgressBarHabits(
         modifier = Modifier
             .fillMaxWidth()
             .height(4.dp)
-            .clip(RoundedCornerShape(2.dp))
+            .clip(RoundedCornerShape(50))
             .background(ProgressIndicatorDefaults.linearTrackColor)
     ) {
         if (progress > 0) {
@@ -27,7 +27,7 @@ fun ProgressBarHabits(
                 modifier = Modifier
                     .fillMaxWidth(progress)
                     .height(4.dp)
-                    .clip(RoundedCornerShape(2.dp))
+                    .clip(RoundedCornerShape(50))
                     .background(ProgressIndicatorDefaults.linearColor)
             )
         }

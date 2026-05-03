@@ -33,7 +33,7 @@ fun HabitTrackerScreen(
     viewModel: HabitTrackerViewModel = viewModel(factory = habitTrackerViewModelFactory(application))
 ) {
     val input = viewModel.input
-    val progress = viewModel.progress
+    val progress by viewModel.progress.collectAsState()
     val currentFilter by viewModel.currentFilterFlow.collectAsState()
     val filteredHabits by viewModel.filteredHabits.collectAsState()
 

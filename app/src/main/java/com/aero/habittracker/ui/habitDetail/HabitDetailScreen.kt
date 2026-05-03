@@ -1,5 +1,7 @@
 package com.aero.habittracker.ui.habitDetail
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -23,6 +25,7 @@ import com.aero.habittracker.ui.habitDetail.components.HabitDetailLoading
 import com.aero.habittracker.ui.habitDetail.components.HabitLogsHistory
 import com.aero.habittracker.ui.habitDetail.components.HabitLogForm
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HabitDetailScreen(
     habitId: Int,
@@ -66,16 +69,14 @@ fun HabitDetailScreen(
                 }
 
                 item {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        HabitDetailContent(
-                            habit = habit!!,
-                            onToggleCompletion = { viewModel.toggleCompletionStatus() },
-                            onDelete = {
-                                viewModel.deleteHabit()
-                                onNavigateBack()
-                            }
-                        )
-                    }
+                    HabitDetailContent(
+                        habit = habit!!,
+                        onToggleCompletion = { viewModel.toggleCompletionStatus() },
+                        onDelete = {
+                            viewModel.deleteHabit()
+                            onNavigateBack()
+                        }
+                    )
                 }
 
                 item {
@@ -83,14 +84,12 @@ fun HabitDetailScreen(
                 }
 
                 item {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        HabitLogForm(
-                            habitId = habit!!.id,
-                            onAddLog = { date ->
-                                viewModel.addLogForDate(date)
-                            }
-                        )
-                    }
+                    HabitLogForm(
+                        habitId = habit!!.id,
+                        onAddLog = { date ->
+                            viewModel.addLogForDate(date)
+                        }
+                    )
                 }
 
                 item {

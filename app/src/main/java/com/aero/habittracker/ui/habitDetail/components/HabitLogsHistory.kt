@@ -1,5 +1,7 @@
 package com.aero.habittracker.ui.habitDetail.components
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -94,11 +96,13 @@ private fun HabitLogItem(log: HabitLogEntity) {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 private fun formatDate(date: LocalDate): String {
     val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     return date.format(formatter)
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 private fun getDayOfWeek(date: LocalDate): String {
     val dayNames = arrayOf(
         "Domingo", "Lunes", "Martes", "Miércoles", "Jueves",

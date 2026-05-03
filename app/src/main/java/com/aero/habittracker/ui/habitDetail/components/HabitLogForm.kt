@@ -1,5 +1,7 @@
 package com.aero.habittracker.ui.habitDetail.components
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,6 +35,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import java.time.LocalDate
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HabitLogForm(
     habitId: Int,
@@ -43,6 +46,7 @@ fun HabitLogForm(
 
     Column(
         modifier = Modifier
+            .padding(16.dp)
             .fillMaxWidth()
             .background(
                 color = MaterialTheme.colorScheme.secondaryContainer,
@@ -114,6 +118,7 @@ fun HabitLogForm(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun HabitLogDatePickerDialog(
     onDateSelected: (LocalDate) -> Unit,
@@ -163,6 +168,7 @@ private fun HabitLogDatePickerDialog(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 private fun formatDateForDisplay(date: LocalDate): String {
     val formatter = java.time.format.DateTimeFormatter.ofPattern("EEEE, dd MMMM yyyy", java.util.Locale("es"))
     return date.format(formatter)

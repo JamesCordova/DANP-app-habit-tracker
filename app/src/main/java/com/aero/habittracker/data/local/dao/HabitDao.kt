@@ -17,10 +17,10 @@ interface HabitDao {
         END as isCompletedToday
         FROM habits h
         LEFT JOIN habit_logs hl ON h.id = hl.habitId 
-            AND DATE(hl.date) = DATE('now')
+            AND hl.date = :date
         ORDER BY h.id DESC
     """)
-    fun getAllHabits(): Flow<List<HabitWithCompletion>>
+    fun getAllHabits(date: java.time.LocalDate): Flow<List<HabitWithCompletion>>
 
     @Query("""
         SELECT h.id, h.title, CASE 
@@ -29,11 +29,11 @@ interface HabitDao {
         END as isCompletedToday
         FROM habits h
         LEFT JOIN habit_logs hl ON h.id = hl.habitId 
-            AND DATE(hl.date) = DATE('now')
+            AND hl.date = :date
         WHERE hl.id IS NOT NULL
         ORDER BY h.id DESC
     """)
-    fun getCompletedHabits(): Flow<List<HabitWithCompletion>>
+    fun getCompletedHabits(date: java.time.LocalDate): Flow<List<HabitWithCompletion>>
 
     @Query("""
         SELECT h.id, h.title, CASE 
@@ -42,11 +42,11 @@ interface HabitDao {
         END as isCompletedToday
         FROM habits h
         LEFT JOIN habit_logs hl ON h.id = hl.habitId 
-            AND DATE(hl.date) = DATE('now')
+            AND hl.date = :date
         WHERE hl.id IS NULL
         ORDER BY h.id DESC
     """)
-    fun getPendingHabits(): Flow<List<HabitWithCompletion>>
+    fun getPendingHabits(date: java.time.LocalDate): Flow<List<HabitWithCompletion>>
 
     @Query("""
         SELECT h.id, h.title, CASE 
@@ -55,10 +55,10 @@ interface HabitDao {
         END as isCompletedToday
         FROM habits h
         LEFT JOIN habit_logs hl ON h.id = hl.habitId 
-            AND DATE(hl.date) = DATE('now')
+            AND hl.date = :date
         WHERE h.id = :id
     """)
-    suspend fun getHabitById(id: Int): HabitWithCompletion?
+    suspend fun getHabitById(id: Int, date: java.time.LocalDate): HabitWithCompletion?
 
     @Insert
     suspend fun insertHabit(habit: HabitEntity): Long

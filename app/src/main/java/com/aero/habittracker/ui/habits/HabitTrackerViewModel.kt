@@ -10,7 +10,8 @@ import com.aero.habittracker.domain.Habit
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -33,11 +34,11 @@ class HabitTrackerViewModel(private val repository: HabitRepository) : ViewModel
             initialValue = emptyList()
         )
 
-    val filteredHabits: StateFlow<List<Habit>> = filterStateFlow.flatMapLatest { filter ->
+    val filteredHabits: StateFlow<List<Habit>> = combine(habits, filterStateFlow) { list, filter ->
         when (filter) {
-            HabitFilter.ALL -> repository.getAllHabits()
-            HabitFilter.COMPLETED -> repository.getCompletedHabits()
-            HabitFilter.PENDING -> repository.getPendingHabits()
+            HabitFilter.ALL -> list
+            HabitFilter.COMPLETED -> list.filter { it.isCompletedToday }
+            HabitFilter.PENDING -> list.filter { !it.isCompletedToday }
         }
     }.stateIn(
         scope = viewModelScope,
@@ -45,13 +46,15 @@ class HabitTrackerViewModel(private val repository: HabitRepository) : ViewModel
         initialValue = emptyList()
     )
 
-    val completedCount: Int
-        get() = habits.value.count { it.isCompletedToday }
-
-    val progress: Float
-        get() = if (habits.value.isNotEmpty()) {
-            completedCount.toFloat() / habits.value.size
-        } else 0.0f
+    val progress: StateFlow<Float> = habits.map { list ->
+        if (list.isNotEmpty()) {
+            list.count { it.isCompletedToday }.toFloat() / list.size
+        } else 0f
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = 0f
+    )
 
     fun onInputChange(newInput: String) {
         input = newInput

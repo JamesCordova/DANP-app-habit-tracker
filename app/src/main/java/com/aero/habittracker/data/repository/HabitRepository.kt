@@ -1,7 +1,10 @@
 package com.aero.habittracker.data.repository
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.aero.habittracker.data.local.dao.HabitDao
 import com.aero.habittracker.data.local.dao.HabitLogDao
+import com.aero.habittracker.data.local.dao.HabitWithCompletion
 import com.aero.habittracker.data.local.entity.HabitEntity
 import com.aero.habittracker.data.local.entity.HabitLogEntity
 import com.aero.habittracker.domain.Habit
@@ -14,20 +17,23 @@ class HabitRepository(
     private val habitLogDao: HabitLogDao
 ) {
 
-    fun getAllHabits(): Flow<List<Habit>> {
-        return habitDao.getAllHabits().map { habits ->
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getAllHabits(date: LocalDate = LocalDate.now()): Flow<List<Habit>> {
+        return habitDao.getAllHabits(date).map { habits ->
             habits.map { it.toDomain() }
         }
     }
 
-    fun getCompletedHabits(): Flow<List<Habit>> {
-        return habitDao.getCompletedHabits().map { habits ->
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getCompletedHabits(date: LocalDate = LocalDate.now()): Flow<List<Habit>> {
+        return habitDao.getCompletedHabits(date).map { habits ->
             habits.map { it.toDomain() }
         }
     }
 
-    fun getPendingHabits(): Flow<List<Habit>> {
-        return habitDao.getPendingHabits().map { habits ->
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getPendingHabits(date: LocalDate = LocalDate.now()): Flow<List<Habit>> {
+        return habitDao.getPendingHabits(date).map { habits ->
             habits.map { it.toDomain() }
         }
     }
@@ -44,11 +50,13 @@ class HabitRepository(
         habitDao.deleteHabit(habit.toEntity())
     }
 
-    suspend fun getHabitById(id: Int): Habit? {
-        return habitDao.getHabitById(id)?.toDomain()
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun getHabitById(id: Int, date: LocalDate = LocalDate.now()): Habit? {
+        return habitDao.getHabitById(id, date)?.toDomain()
     }
 
     // Métodos para manejar logs
+    @RequiresApi(Build.VERSION_CODES.O)
     suspend fun toggleHabitCompletion(habitId: Int) {
         val today = LocalDate.now()
         val existingLog = habitLogDao.getLogByHabitAndDate(habitId, today)
@@ -87,7 +95,7 @@ class HabitRepository(
 }
 
 // Extension para mapeo
-fun com.aero.habittracker.data.local.dao.HabitWithCompletion.toDomain() = Habit(
+fun HabitWithCompletion.toDomain() = Habit(
     id = id,
     title = title,
     isCompletedToday = isCompletedToday

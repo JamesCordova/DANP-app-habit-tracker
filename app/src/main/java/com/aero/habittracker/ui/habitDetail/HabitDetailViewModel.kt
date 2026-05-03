@@ -1,5 +1,7 @@
 package com.aero.habittracker.ui.habitDetail
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aero.habittracker.data.local.entity.HabitLogEntity
@@ -12,6 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+@RequiresApi(Build.VERSION_CODES.O)
 class HabitDetailViewModel(
     private val habitId: Int,
     private val repository: HabitRepository
@@ -37,6 +40,7 @@ class HabitDetailViewModel(
         loadHabit()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun loadHabit() {
         viewModelScope.launch {
             try {
@@ -66,6 +70,7 @@ class HabitDetailViewModel(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun toggleCompletionStatus() {
         viewModelScope.launch {
             try {
