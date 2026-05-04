@@ -58,6 +58,18 @@ interface HabitDao {
             AND hl.date = :date
         WHERE h.id = :id
     """)
+    fun getHabitByIdFlow(id: Int, date: java.time.LocalDate): Flow<HabitWithCompletion?>
+
+    @Query("""
+        SELECT h.id, h.title, CASE 
+            WHEN hl.id IS NOT NULL THEN 1 
+            ELSE 0 
+        END as isCompletedToday
+        FROM habits h
+        LEFT JOIN habit_logs hl ON h.id = hl.habitId 
+            AND hl.date = :date
+        WHERE h.id = :id
+    """)
     suspend fun getHabitById(id: Int, date: java.time.LocalDate): HabitWithCompletion?
 
     @Insert

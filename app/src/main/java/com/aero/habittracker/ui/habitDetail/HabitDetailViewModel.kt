@@ -20,8 +20,13 @@ class HabitDetailViewModel(
     private val repository: HabitRepository
 ) : ViewModel() {
 
-    private val _habit = MutableStateFlow<Habit?>(null)
-    val habit: StateFlow<Habit?> = _habit.asStateFlow()
+    // El estado del hábito ahora es reactivo: observa la base de datos directamente
+    val habit: StateFlow<Habit?> = repository.getHabitByIdFlow(habitId)
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -36,34 +41,10 @@ class HabitDetailViewModel(
             initialValue = emptyList()
         )
 
-    init {
-        loadHabit()
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun loadHabit() {
-        viewModelScope.launch {
-            try {
-                _isLoading.value = true
-                _error.value = null
-                val loadedHabit = repository.getHabitById(habitId)
-                _habit.value = loadedHabit
-                if (loadedHabit == null) {
-                    _error.value = "Hábito no encontrado"
-                }
-            } catch (e: Exception) {
-                _error.value = "Error al cargar el hábito: ${e.message}"
-            } finally {
-                _isLoading.value = false
-            }
-        }
-    }
-
     fun updateHabit(habit: Habit) {
         viewModelScope.launch {
             try {
                 repository.updateHabit(habit)
-                _habit.value = habit
             } catch (e: Exception) {
                 _error.value = "Error al actualizar el hábito: ${e.message}"
             }
@@ -75,9 +56,6 @@ class HabitDetailViewModel(
         viewModelScope.launch {
             try {
                 repository.toggleHabitCompletion(habitId)
-                // Recargar el hábito para obtener el estado actualizado
-                val updatedHabit = repository.getHabitById(habitId)
-                _habit.value = updatedHabit
             } catch (e: Exception) {
                 _error.value = "Error al cambiar el estado: ${e.message}"
             }
@@ -85,7 +63,7 @@ class HabitDetailViewModel(
     }
 
     fun deleteHabit() {
-        _habit.value?.let { currentHabit ->
+        habit.value?.let { currentHabit ->
             viewModelScope.launch {
                 try {
                     repository.deleteHabit(currentHabit)
@@ -116,4 +94,3 @@ class HabitDetailViewModel(
         }
     }
 }
-

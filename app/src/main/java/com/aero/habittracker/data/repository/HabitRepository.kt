@@ -11,9 +11,7 @@ import com.aero.habittracker.domain.Habit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import java.time.LocalDate
-import java.time.temporal.ChronoUnit
 
 class HabitRepository(
     private val habitDao: HabitDao,
@@ -70,6 +68,16 @@ class HabitRepository(
         val habitWithCompletion = habitDao.getHabitById(id, date) ?: return null
         val logs = habitLogDao.getLogsByHabit(id).first()
         return habitWithCompletion.toDomain(logs)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getHabitByIdFlow(id: Int, date: LocalDate = LocalDate.now()): Flow<Habit?> {
+        return combine(
+            habitDao.getHabitByIdFlow(id, date),
+            habitLogDao.getLogsByHabit(id)
+        ) { habitWithCompletion, logs ->
+            habitWithCompletion?.toDomain(logs)
+        }
     }
 
     // Métodos para manejar logs
