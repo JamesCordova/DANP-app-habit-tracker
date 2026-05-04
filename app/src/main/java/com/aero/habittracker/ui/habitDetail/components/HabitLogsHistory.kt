@@ -22,6 +22,7 @@ import com.aero.habittracker.data.local.entity.HabitLogEntity
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HabitLogsHistory(logs: List<HabitLogEntity>) {
     Column(
@@ -50,6 +51,7 @@ fun HabitLogsHistory(logs: List<HabitLogEntity>) {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun HabitLogItem(log: HabitLogEntity) {
     Row(
