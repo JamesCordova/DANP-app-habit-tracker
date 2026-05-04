@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.rounded.Whatshot
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -17,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.aero.habittracker.domain.Habit
 
@@ -30,13 +32,13 @@ fun HabitItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
+            .padding(vertical = 4.dp)
             .clickable { onClick() },
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Row(
-            modifier = Modifier
-                .weight(1f),
+            modifier = Modifier.weight(1f),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Checkbox(
@@ -47,20 +49,43 @@ fun HabitItem(
             Text(
                 text = habit.title,
                 color = if (habit.isCompletedToday)
-                            MaterialTheme.colorScheme.primary
-                        else
-                            MaterialTheme.colorScheme.onSurface,
+                    MaterialTheme.colorScheme.primary
+                else
+                    MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.bodyLarge
             )
         }
-        IconButton(
-            onClick = onDelete
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.Delete,
-                contentDescription = "Agregar hábito",
-                tint = MaterialTheme.colorScheme.error
-            )
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (habit.streak > 0) {
+                Icon(
+                    imageVector = Icons.Rounded.Whatshot,
+                    contentDescription = "Racha",
+                    tint = if (habit.isCompletedToday)
+                        MaterialTheme.colorScheme.primary
+                    else
+                        MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.padding(end = 4.dp)
+                )
+                Text(
+                    text = "${habit.streak}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = if (habit.isCompletedToday)
+                        MaterialTheme.colorScheme.primary
+                    else
+                        MaterialTheme.colorScheme.secondary
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+
+            IconButton(onClick = onDelete) {
+                Icon(
+                    imageVector = Icons.Outlined.Delete,
+                    contentDescription = "Eliminar hábito",
+                    tint = MaterialTheme.colorScheme.error.copy(alpha = 0.6f)
+                )
+            }
         }
     }
 }

@@ -28,5 +28,8 @@ interface HabitLogDao {
 
     @Query("DELETE FROM habit_logs WHERE habitId = :habitId AND date = :date")
     suspend fun deleteLogByHabitAndDate(habitId: Int, date: LocalDate)
+
+    @Query("SELECT * FROM habit_logs ORDER BY date DESC")
+    fun getAllLogs(): Flow<List<HabitLogEntity>>
 }
 

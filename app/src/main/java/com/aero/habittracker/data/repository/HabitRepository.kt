@@ -9,8 +9,11 @@ import com.aero.habittracker.data.local.entity.HabitEntity
 import com.aero.habittracker.data.local.entity.HabitLogEntity
 import com.aero.habittracker.domain.Habit
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 class HabitRepository(
     private val habitDao: HabitDao,
@@ -19,22 +22,34 @@ class HabitRepository(
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun getAllHabits(date: LocalDate = LocalDate.now()): Flow<List<Habit>> {
-        return habitDao.getAllHabits(date).map { habits ->
-            habits.map { it.toDomain() }
+        return combine(
+            habitDao.getAllHabits(date),
+            habitLogDao.getAllLogs()
+        ) { habits, allLogs ->
+            val logsByHabit = allLogs.groupBy { it.habitId }
+            habits.map { it.toDomain(logsByHabit[it.id] ?: emptyList()) }
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun getCompletedHabits(date: LocalDate = LocalDate.now()): Flow<List<Habit>> {
-        return habitDao.getCompletedHabits(date).map { habits ->
-            habits.map { it.toDomain() }
+        return combine(
+            habitDao.getCompletedHabits(date),
+            habitLogDao.getAllLogs()
+        ) { habits, allLogs ->
+            val logsByHabit = allLogs.groupBy { it.habitId }
+            habits.map { it.toDomain(logsByHabit[it.id] ?: emptyList()) }
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun getPendingHabits(date: LocalDate = LocalDate.now()): Flow<List<Habit>> {
-        return habitDao.getPendingHabits(date).map { habits ->
-            habits.map { it.toDomain() }
+        return combine(
+            habitDao.getPendingHabits(date),
+            habitLogDao.getAllLogs()
+        ) { habits, allLogs ->
+            val logsByHabit = allLogs.groupBy { it.habitId }
+            habits.map { it.toDomain(logsByHabit[it.id] ?: emptyList()) }
         }
     }
 
@@ -52,7 +67,9 @@ class HabitRepository(
 
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun getHabitById(id: Int, date: LocalDate = LocalDate.now()): Habit? {
-        return habitDao.getHabitById(id, date)?.toDomain()
+        val habitWithCompletion = habitDao.getHabitById(id, date) ?: return null
+        val logs = habitLogDao.getLogsByHabit(id).first()
+        return habitWithCompletion.toDomain(logs)
     }
 
     // Métodos para manejar logs
@@ -95,11 +112,42 @@ class HabitRepository(
 }
 
 // Extension para mapeo
-fun HabitWithCompletion.toDomain() = Habit(
+@RequiresApi(Build.VERSION_CODES.O)
+fun HabitWithCompletion.toDomain(logs: List<HabitLogEntity>) = Habit(
     id = id,
     title = title,
-    isCompletedToday = isCompletedToday
+    isCompletedToday = isCompletedToday,
+    streak = calculateStreak(logs)
 )
+
+@RequiresApi(Build.VERSION_CODES.O)
+private fun calculateStreak(logs: List<HabitLogEntity>): Int {
+    if (logs.isEmpty()) return 0
+    
+    val sortedDates = logs.map { it.date }.distinct().sortedDescending()
+    val today = LocalDate.now()
+    val yesterday = today.minusDays(1)
+    
+    var streak = 0
+    var nextExpectedDate = if (sortedDates[0] == today) {
+        today
+    } else if (sortedDates[0] == yesterday) {
+        yesterday
+    } else {
+        return 0 // Racha rota si no hay nada hoy ni ayer
+    }
+    
+    for (date in sortedDates) {
+        if (date == nextExpectedDate) {
+            streak++
+            nextExpectedDate = nextExpectedDate.minusDays(1)
+        } else {
+            break
+        }
+    }
+    
+    return streak
+}
 
 fun Habit.toEntity() = HabitEntity(
     id = id,
